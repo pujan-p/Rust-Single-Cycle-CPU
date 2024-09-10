@@ -1,18 +1,18 @@
+use std::sync::Arc;
+
 pub mod register_file;
+pub mod alu;
 
 fn main() {
 
-    let mut regs  = register_file::RegisterFile::new();
-
-    let mut reg_req = register_file::RegisterFileReq {
-        read_register_1: 0,
-        read_register_2: 0,
-        write_register: 0,
-        write_data: 0,
-        reg_write: false,
+    let alu_req = alu::AluReq {
+        read_data_1: 0b110,
+        read_data_2: 0b110,
+        alu_control: alu::AluOP::Add,
+        is_valid: true
     };
 
-    let mut reg_rsp = register_file::RegisterFile::perform_function(&mut regs, &reg_req);
+    let alu_rsp = alu::perform_function(&alu_req);
 
-    println!("reg_rsp is {reg_rsp:#?}");
+    println!("Alu_Rsp: {alu_rsp:#?}")
 }

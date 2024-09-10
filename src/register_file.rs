@@ -2,43 +2,58 @@
 
 #[derive(Debug)]
 pub struct RegisterFileReq {
-    pub read_register_1: usize,
-    pub read_register_2: usize,
-    pub write_register: usize,
-    pub write_data: u32, // !What type?
-    pub reg_write: bool
+    pub read_register_1: u8,
+    pub read_register_2: u8,
+    pub write_register: u8,
+    pub write_data: u32,
+    pub reg_write: bool,
+    pub is_valid: bool,
 }
 
 #[derive(Debug)]
 pub struct RegisterFileRsp {
-    pub read_data_1: u32, // !What type?
-    pub read_data_2: u32, // !What type?
+    pub read_data_1: u32,
+    pub read_data_2: u32,
+    pub is_valid: bool,
 }
 
 #[derive(Debug)]
 pub struct RegisterFile {
-    regs: [u32; 32], // !What type?
+    regs: [u32; 32],
 }
 
 impl RegisterFile {
-    pub fn new() -> RegisterFile {
-        let mut init_regs: [u32; 32] = [0; 32]; // *Can modify individual regs as necessary after
+    pub fn new() -> Self {
+        let init_regs: [u32; 32] = [0; 32]; // *Can modify individual regs as necessary after if mut
         RegisterFile { regs: init_regs }
     }
 
     pub fn perform_function(&mut self, req: &RegisterFileReq) -> RegisterFileRsp {
-        if req.reg_write != true {
+
+        if !req.is_valid {
             return RegisterFileRsp {
-                read_data_1: self.regs[req.read_register_1],
-                read_data_2: self.regs[req.read_register_2],
+                read_data_1: 0,
+                read_data_2: 0,
+                is_valid: false
             }
-        } else {
-            self.regs[req.write_register] = req.write_data;
         }
-        self.regs[0] = 0;
+
+        let rr_1 = req.read_register_1 as usize;
+        let rr_2 = req.read_register_2 as usize;
+        let wr = req.write_register as usize;
+        
+        if req.reg_write {
+            self.regs[wr] = req.write_data;
+        }
+
+        let read_data_1 = if req.is_valid && !req.reg_write { self.regs[rr_1] } else { 0 };
+        let read_data_2 = if req.is_valid && !req.reg_write { self.regs[rr_2] } else { 0 };
+        let is_valid = req.is_valid && !req.reg_write;
+
         RegisterFileRsp {
-            read_data_1: self.regs[0],
-            read_data_2: self.regs[0],
+            read_data_1,
+            read_data_2,
+            is_valid
         }
     }
 }

@@ -7,6 +7,7 @@ pub struct RegisterFileReq {
     pub write_register: u8,
     pub write_data: u32,
     pub reg_write: bool,
+    pub reg_read: bool,
     pub is_valid: bool,
 }
 
@@ -23,8 +24,10 @@ pub struct RegisterFile {
 }
 
 impl RegisterFile {
+
     pub fn new() -> Self {
-        let init_regs: [u32; 32] = [0; 32]; // *Can modify individual regs as necessary after if mut
+        let mut init_regs: [u32; 32] = [0; 32];
+        init_regs[1] = 28;
         RegisterFile { regs: init_regs }
     }
 
@@ -46,9 +49,9 @@ impl RegisterFile {
             self.regs[wr] = req.write_data;
         }
 
-        let read_data_1 = if req.is_valid && !req.reg_write { self.regs[rr_1] } else { 0 };
-        let read_data_2 = if req.is_valid && !req.reg_write { self.regs[rr_2] } else { 0 };
-        let is_valid = req.is_valid && !req.reg_write;
+        let read_data_1 = if req.reg_read { self.regs[rr_1] } else { 0 };
+        let read_data_2 = if req.reg_read { self.regs[rr_2] } else { 0 };
+        let is_valid = req.reg_read;
 
         RegisterFileRsp {
             read_data_1,

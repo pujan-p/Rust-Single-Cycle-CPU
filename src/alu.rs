@@ -28,6 +28,7 @@ pub fn perform_function(req: &AluReq) -> AluRsp {
             is_valid: false,
         }
     }
+    
     let alu_result: u32;
     match req.alu_control {
         AluOP::Add => alu_result = req.read_data_1 + req.read_data_2,

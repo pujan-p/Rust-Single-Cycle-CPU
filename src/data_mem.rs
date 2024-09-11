@@ -1,18 +1,18 @@
 // Data Memory
 
+use crate::decode::Flags;
+
 #[derive(Debug)]
 pub struct DataMemReq {
     pub address: u32,
     pub write_data: u32,
-    pub read_mem: bool,
-    pub write_mem: bool,
-    pub is_valid: bool,
+    pub flags: Flags,
 }
 
 #[derive(Debug)]
 pub struct DataMemRsp {
     pub read_data: u32,
-    pub is_valid: bool,
+    pub flags: Flags,
 }
 
 #[derive(Debug)]
@@ -28,21 +28,28 @@ impl DataMem {
         DataMem { data_mem: init_data_mem }
     }
 
-    pub fn perform_function(&mut self, req: DataMemReq) -> DataMemRsp {
-        if !req.is_valid {
+    pub fn perform_function(&mut self, req: &DataMemReq) -> DataMemRsp {
+        if !req.flags.is_valid {
             return DataMemRsp {
                 read_data: 0,
-                is_valid: false,
+                flags: Flags {
+                    opcode: req.flags.opcode.clone(),
+                    ..req.flags
+                }
             }
         }
         
-        if req.write_mem {
+        if req.flags.write_mem {
             self.data_mem[req.address as usize] = req.write_data;
         }
 
         DataMemRsp {
-            read_data: if req.read_mem { self.data_mem[req.address as usize] } else { 0 },
-            is_valid: req.read_mem,
+            read_data: if req.flags.read_mem { self.data_mem[req.address as usize] } else { 0 },
+            
+            flags: Flags {
+                opcode: req.flags.opcode.clone(),
+                ..req.flags
+            }
         }
     }
 }

@@ -1,7 +1,6 @@
 // Instruction Memory
 // TODO: read from "path/instruction_memory.txt"
 
-use crate::decode::Format;
 use crate::decode::Flags;
 
 #[derive(Debug)]
